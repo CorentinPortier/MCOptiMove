@@ -9,7 +9,6 @@ namespace NPDicoBiomes
     {
         // Variable
         public Dictionary<string, List<List<string>>> dicoBiomes { get; set; }
-
         private string dicoPath = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\Sources\Data\DicoBiomes.txt";
 
         // Constructeur

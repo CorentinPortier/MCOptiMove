@@ -11,6 +11,9 @@ namespace NPDicoBiomes
     {
         static void Main(string[] args)
         {
+            //string pathToDataFolder = (Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent).ToString();
+            //string fileName = "DicoBiomes.txt";
+            //string path =pathToDataFolder+@"\"+fileName;
             string path = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\Sources\Data\DicoBiomes.txt";
             var dicoBiomes = GetBiomesDictionnary();
 

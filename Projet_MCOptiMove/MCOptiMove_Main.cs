@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
+using MCPMT = Projet_MCOptiMove.McPixelMapTools;
+
 namespace Projet_MCOptiMove
 {
     class MCOptiMove_Main
@@ -11,21 +13,21 @@ namespace Projet_MCOptiMove
         static void Main(string[] args)
         {
             DicoBiomes dicoBiomes = new DicoBiomes();
-            Color desertColor = GetColor(dicoBiomes.GetColorOfBiome("Desert"));
+            Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
 
             string savePath = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\RESULT_MAPS\";
 
             // bitmap
-            Bitmap bmp1 = CreateRandomMap(width: 3, height: 3);
+            Bitmap bmp1 = MCPMT.CreateRandomMap(width: 3, height: 3);
             bmp1.SetPixel(1, 0, desertColor);
             bmp1.SetPixel(1, 1, desertColor);
             bmp1.SetPixel(2, 1, desertColor);
             // Save (write) the images 
             bmp1.Save(savePath + "RandomPixel_1.png");
-            Bitmap bmp1_Desert = IsolateBiome(bmp1, desertColor);
+            Bitmap bmp1_Desert = MCPMT.IsolateBiome(bmp1, desertColor);
             bmp1_Desert.Save(savePath + "test_1.png");
 
-            Bitmap bmp2 = CreateRandomMap(width: 6, height: 5);
+            Bitmap bmp2 = MCPMT.CreateRandomMap(width: 6, height: 5);
             bmp2.SetPixel(1, 0, desertColor);
             bmp2.SetPixel(1, 1, desertColor);
             bmp2.SetPixel(2, 1, desertColor);
@@ -34,7 +36,7 @@ namespace Projet_MCOptiMove
             bmp2.SetPixel(1, 3, desertColor);
             // Save (write) the images 
             bmp2.Save(savePath + "RandomPixel_2.png");
-            Bitmap bmp2_Desert = IsolateBiome(bmp2, desertColor);
+            Bitmap bmp2_Desert = MCPMT.IsolateBiome(bmp2, desertColor);
             bmp2_Desert.Save(savePath + "test_2.png");
 
             // TESTS MAPS
@@ -47,9 +49,9 @@ namespace Projet_MCOptiMove
 
             // TESTS MAP 1
 
-            //int[] startPixel_1 = GetFirstNoAlphaPixelCoordinate(bmp1_Desert);
+            //int[] startPixel_1 = MCPMT.GetFirstNoAlphaPixelCoordinate(bmp1_Desert);
 
-            //listePixels = Rlooping(bmp1_Desert, listePixels, startPixel_1, ref firstColumnDone, mvtLoop, listeStop, mvtBas, mvtHaut);
+            //listePixels = MCPMT.GetBiomeBorderList(bmp1_Desert, listePixels, startPixel_1, ref firstColumnDone, mvtLoop, listeStop, mvtBas, mvtHaut);
 
             //foreach (var elt in listePixels)
             //{
@@ -60,9 +62,9 @@ namespace Projet_MCOptiMove
 
             // TEST MAP 2
 
-            int[] startPixel_2 = GetFirstNoAlphaPixelCoordinate(bmp2_Desert);
+            int[] startPixel_2 = MCPMT.GetFirstNoAlphaPixelCoordinate(bmp2_Desert);
 
-            listePixels = Rlooping(bmp2_Desert, listePixels, startPixel_2, ref firstColumnDone, mvtLoop, listeStop, mvtBas, mvtHaut);
+            listePixels = MCPMT.GetBiomeBorderList(bmp2_Desert, listePixels, startPixel_2, ref firstColumnDone, mvtLoop, listeStop, mvtBas, mvtHaut);
 
             foreach (var elt in listePixels)
             {
@@ -70,91 +72,7 @@ namespace Projet_MCOptiMove
                     Console.Write(coord);
                 Console.WriteLine();
             }
-
         }
-        // Méthodes de tests
-        public static Bitmap CreateRandomMap(int width, int height)
-        {
-            // Random number
-            Random rand = new Random();
-
-            // bitmap
-            Bitmap bmp = new Bitmap(width, height);
-
-            // create random pixels
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    // Generate random ARGB values
-                    int a = rand.Next(256);
-                    int r = rand.Next(256);
-                    int g = rand.Next(256);
-                    int b = rand.Next(256);
-
-                    // Set ARGB value
-                    bmp.SetPixel(x, y, Color.FromArgb(a, r, g, b));
-                }
-            }
-            return bmp;
-        }
-        // Méthodes
-        public static Color GetColor(List<int> RGB)
-        {
-            return Color.FromArgb(RGB[0], RGB[1], RGB[2]);
-        }
-        public static int[] GetFirstNoAlphaPixelCoordinate(Bitmap bmp)
-        {
-            for (int i = 0; i < bmp.Width; ++i)
-            {
-                for (int y = 0; y < bmp.Height; ++y)
-                {
-                    if (bmp.GetPixel(i, y).A != 0)
-                        return new int[] { i, y };
-                }
-            }
-            return null;
-        }
-        public static Bitmap IsolateBiome(Bitmap bmpIn, Color researchedColor)
-        {
-            List<string> mvt = new List<string> { "B", "G", "D", "H" };
-            Bitmap filtratedBitmap = new Bitmap(bmpIn);
-
-            for (int i = 0; i < bmpIn.Width; ++i)
-            {
-                for (int y = 0; y < bmpIn.Height; ++y)
-                {
-                    if (bmpIn.GetPixel(i, y) == researchedColor)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        filtratedBitmap.SetPixel(i, y, Color.FromArgb(alpha: 0, Color.White));
-                    }
-                }
-            }
-            return filtratedBitmap;
-        }
-        public static void GetBiomeBorderList(Bitmap bmp, int[] startPixelCoordinate)
-        {
-            char[] mvtBas = new char[4] { 'B', 'G', 'D', 'H' };
-            char[] mvtHaut = new char[4] { 'H', 'D', 'G', 'B' };
-            List<char> liste = new List<char>(mvtBas);
-
-        }
-
-        // char[] mvtBas = new char[4] { 'B', 'G', 'D', 'H' };
-        // char[] mvtHaut = new char[4] { 'H', 'D', 'G', 'B' };
-
-        // Bitmap bmDesert = IsolateBiome(bmp, desertColor);
-
-        // List<int[]> listePixels = new List<int[]>();
-
-        // int[] startPixel = GetFirstNoAlphaPixelCoordinate(bmDesert);
-        // bool firstColumnDone = false;
-        // char mvtLoop = 'B';
-        // List<char> listeStop = new List<char>(){ 'H' };
 
         public static List<int[]> Rlooping(Bitmap bmp, List<int[]> listePixels, int[] pixel, ref bool firstColumnDone, char mvtLoop, List<char> listeStop, char[] mvtBas, char[] mvtHaut)
         {
