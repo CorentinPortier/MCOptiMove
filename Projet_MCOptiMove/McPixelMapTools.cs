@@ -69,7 +69,7 @@ namespace Projet_MCOptiMove
             }
             return null;
         }
-        public static List<int[]> GetBiomeBorderList(Bitmap bmp, List<int[]> listePixels, int[] pixel, ref bool firstColumnDone, char mvtLoop, List<char> listeStop, char[] mvtBas, char[] mvtHaut)
+        public static List<int[]> GetBiomeBorderList(Bitmap bmp, List<int[]> listePixels, int[] pixel, ref bool firstColumnDone, ref bool stopAllLoops,char mvtLoop, List<char> listeStop, char[] mvtBas, char[] mvtHaut)
         {
             //
             Console.WriteLine("Je suis le Pixel ({0}, {1})", pixel[0], pixel[1]);
@@ -79,31 +79,34 @@ namespace Projet_MCOptiMove
             {
                 if (listePixels[0].SequenceEqual(pixel))
                 {
-                    //stopAllLoops = true;
+                    stopAllLoops = true;
                     return listePixels;
                 }
             }
-            // Levé à la première boucle car la liste est vide
+            // Exception levée à la première boucle car la liste est vide
             catch (Exception) { }
 
             listePixels.Add(pixel);
 
-            List<char> mvtsPixel = new List<char>(mvtBas);
-            if (!firstColumnDone)
-                listeStop.Add('G');
-
-            foreach (char mvt in listeStop)
-            {
-                mvtsPixel.Remove(mvt);
-            }
-
             //
-            foreach (char mvt in listeStop)
-                Console.WriteLine("Mouvement supprimés : " + mvt);
+            Console.WriteLine("mvtLoop =" + mvtLoop);
             //
 
             if (mvtLoop == 'B')
             {
+                List<char> mvtsPixel = new List<char>(mvtBas);
+                if (!firstColumnDone)
+                    listeStop.Add('G');
+
+                foreach (char mvt in listeStop)
+                {
+                    mvtsPixel.Remove(mvt);
+                }
+                //
+                foreach (char mvt in listeStop)
+                    Console.WriteLine("Mouvement supprimés : " + mvt);
+                //
+
                 foreach (char direction in mvtsPixel)
                 {
                     //
@@ -113,12 +116,16 @@ namespace Projet_MCOptiMove
                     {
                         case ('B'):
                             if ((pixel[1] + 1 < bmp.Height) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0], pixel[1] + 1)))
-                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] + 1 }, ref firstColumnDone, mvtLoop, new List<char> { 'H' }, mvtBas, mvtHaut);
+                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] + 1 }, ref firstColumnDone, ref stopAllLoops, mvtLoop, new List<char> { 'H' }, mvtBas, mvtHaut);
+                            if (stopAllLoops)
+                                return listePixels;
                             break;
 
                         case ('G'):
-                            if ((pixel[0] - 1 > 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0] - 1, pixel[1])))
-                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0] - 1, pixel[1] }, ref firstColumnDone, mvtLoop, new List<char> { 'D' }, mvtBas, mvtHaut);
+                            if ((pixel[0] - 1 >= 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0] - 1, pixel[1])))
+                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0] - 1, pixel[1] }, ref firstColumnDone, ref stopAllLoops, mvtLoop, new List<char> { 'D' }, mvtBas, mvtHaut);
+                            if (stopAllLoops)
+                                return listePixels;
                             break;
 
                         case ('D'):
@@ -126,40 +133,86 @@ namespace Projet_MCOptiMove
                             if (!firstColumnDone)
                                 firstColumnDone = true;
                             if ((pixel[0] + 1 < bmp.Width) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0] + 1, pixel[1])))
-                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0] + 1, pixel[1] }, ref firstColumnDone, mvtLoop, new List<char> { 'G' }, mvtBas, mvtHaut);
+                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0] + 1, pixel[1] }, ref firstColumnDone, ref stopAllLoops, mvtLoop, new List<char> { 'G' }, mvtBas, mvtHaut);
+                            if (stopAllLoops)
+                                return listePixels;
                             break;
 
                         case ('H'):
-                            if ((pixel[1] - 1 < 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0], pixel[1] - 1)))
-                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] - 1 }, ref firstColumnDone, mvtLoop, new List<char> { 'B' }, mvtBas, mvtHaut);
+                            if ((pixel[1] - 1 >= 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0], pixel[1] - 1)))
+                            {
+                                // On change le sens de la boucle;
+                                // mvtLoop = 'H';
+                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] - 1 }, ref firstColumnDone, ref stopAllLoops, mvtLoop: 'H', new List<char> { 'B' }, mvtBas, mvtHaut);
+                            }
+                            if (stopAllLoops)
+                                return listePixels;
                             break;
                     }
                 }
             }
             if (mvtLoop == 'H')
             {
+                List<char> mvtsPixel = new List<char>(mvtHaut);
+
+                foreach (char mvt in listeStop)
+                {
+                    mvtsPixel.Remove(mvt);
+                }
+                //
+                foreach (char mvt in listeStop)
+                    Console.WriteLine("Mouvement supprimés : " + mvt);
+                //
+
                 foreach (char direction in mvtsPixel)
                 {
+                    //
+                    Console.WriteLine("({0}, {1}) prend la direction {2}", pixel[0], pixel[1], direction);
+                    //
                     switch (direction)
                     {
                         case ('H'):
-                            if ((pixel[1] - 1 < 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0], pixel[1] - 1)))
-                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] - 1 }, ref firstColumnDone, mvtLoop, new List<char> { 'B' }, mvtBas, mvtHaut);
+                            if ((pixel[1] - 1 >= 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0], pixel[1] - 1)))
+                            {
+                                // On garde le sens de la boucle;
+                                // mvtLoop = 'H';
+                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] - 1 }, ref firstColumnDone, ref stopAllLoops, mvtLoop: 'H', new List<char> { 'B' }, mvtBas, mvtHaut);
+                            }
+                            if (stopAllLoops)
+                                return listePixels;
                             break;
 
                         case ('D'):
                             if ((pixel[0] + 1 < bmp.Width) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0] + 1, pixel[1])))
-                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0] + 1, pixel[1] }, ref firstColumnDone, mvtLoop, new List<char> { 'G' }, mvtBas, mvtHaut);
+                            {
+                                // On garde le sens de la boucle;
+                                // mvtLoop = 'H';
+                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0] + 1, pixel[1] }, ref firstColumnDone, ref stopAllLoops, mvtLoop: 'H', new List<char> { 'G' }, mvtBas, mvtHaut);
+                            }
+                            if (stopAllLoops)
+                                return listePixels;
                             break;
 
                         case ('G'):
-                            if ((pixel[0] - 1 > 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0] - 1, pixel[1])))
-                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0] - 1, pixel[1] }, ref firstColumnDone, mvtLoop, new List<char> { 'D' }, mvtBas, mvtHaut);
+                            if ((pixel[0] - 1 >= 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0] - 1, pixel[1])))
+                            {
+                                // On garde le sens de la boucle;
+                                // mvtLoop = 'H';
+                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0] - 1, pixel[1] }, ref firstColumnDone, ref stopAllLoops, mvtLoop: 'H', new List<char> { 'D' }, mvtBas, mvtHaut);
+                            }
+                            if (stopAllLoops)
+                                return listePixels;
                             break;
 
                         case ('B'):
                             if ((pixel[1] + 1 < bmp.Height) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0], pixel[1] + 1)))
-                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] + 1 }, ref firstColumnDone, mvtLoop, new List<char> { 'H' }, mvtBas, mvtHaut);
+                            {
+                                // On change le sens de la boucle;
+                                // mvtLoop = 'B';
+                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] + 1 }, ref firstColumnDone, ref stopAllLoops, mvtLoop: 'B', new List<char> { 'H' }, mvtBas, mvtHaut);
+                            }
+                            if (stopAllLoops)
+                                return listePixels;
                             break;
                     }
                 }
