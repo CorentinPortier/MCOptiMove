@@ -32,6 +32,14 @@ namespace Projet_MCOptiMove
             }
             return bmp;
         }
+        public static Bitmap AddPixelsToMap(Bitmap mapBase, List<int[]> listePixels, Color biomeColor)
+        {
+            foreach(var pixel in listePixels)
+            {
+                mapBase.SetPixel(pixel[0], pixel[1], biomeColor);
+            }
+            return mapBase;
+        }
         public static Bitmap IsolateBiome(Bitmap bmpIn, Color researchedColor)
         {
             List<string> mvt = new List<string> { "B", "G", "D", "H" };

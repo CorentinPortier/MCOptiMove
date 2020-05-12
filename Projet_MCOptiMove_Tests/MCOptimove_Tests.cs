@@ -27,6 +27,8 @@ namespace Projet_MCOptiMove_Tests
         private char mvtLoop;
         private List<char> listeStop;
 
+        private string savePath = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\RESULT_MAPS\";
+
         [TestInitialize]
         public void InitialisationDesTests()
         {
@@ -355,7 +357,7 @@ namespace Projet_MCOptiMove_Tests
             Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
 
             // bitmap
-            Bitmap bmp = CreateRandomMap(width: 10, height: 7);
+            Bitmap bmp = CreateRandomMap(width: 4, height: 4);
             bmp.SetPixel(0, 0, desertColor);
             bmp.SetPixel(0, 1, desertColor);
             bmp.SetPixel(0, 2, desertColor);
@@ -411,7 +413,205 @@ namespace Projet_MCOptiMove_Tests
             Assert.IsTrue(testListe.Count() == 0);
 
         }
+        [TestMethod]
+        public void CreerCartePersonnalisee_LoopCompleteComplexe_ObtientBienLabonneListeDePixel()
+        {
+            //      _                              
+            //     /_\  _ _ _ _ __ _ _ _  __ _ ___ 
+            //    / _ \| '_| '_/ _` | ' \/ _` / -_)
+            //   /_/ \_\_| |_| \__,_|_||_\__, \___|
+            //                           |___/ 
+            DicoBiomes dicoBiomes = new DicoBiomes();
+            Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
 
+            // bitmap
+            Bitmap bmp = CreateRandomMap(width: 10, height: 7);
+            bmp.SetPixel(0, 0, desertColor);
+            bmp.SetPixel(0, 1, desertColor);
+            bmp.SetPixel(0, 2, desertColor);
+            bmp.SetPixel(0, 3, desertColor);
+            bmp.SetPixel(0, 4, desertColor);
+            bmp.SetPixel(1, 4, desertColor);
+            bmp.SetPixel(2, 4, desertColor);
+            bmp.SetPixel(2, 5, desertColor);
+            bmp.SetPixel(2, 6, desertColor);
+            bmp.SetPixel(1, 6, desertColor);
+            bmp.SetPixel(0, 6, desertColor);
+
+            bmp.SetPixel(3, 4, desertColor);
+            bmp.SetPixel(4, 4, desertColor);
+            bmp.SetPixel(4, 5, desertColor);
+            bmp.SetPixel(4, 6, desertColor);
+            bmp.SetPixel(5, 6, desertColor);
+            bmp.SetPixel(6, 6, desertColor);
+            bmp.SetPixel(7, 6, desertColor);
+            bmp.SetPixel(7, 5, desertColor);
+            bmp.SetPixel(7, 4, desertColor);
+            bmp.SetPixel(7, 3, desertColor);
+            bmp.SetPixel(7, 2, desertColor);
+            bmp.SetPixel(8, 2, desertColor);
+            bmp.SetPixel(9, 2, desertColor);
+            bmp.SetPixel(9, 1, desertColor);
+            bmp.SetPixel(9, 3, desertColor);
+
+            bmp.SetPixel(6, 4, desertColor);
+            bmp.SetPixel(5, 4, desertColor);
+            bmp.SetPixel(5, 3, desertColor);
+            bmp.SetPixel(5, 2, desertColor);
+            bmp.SetPixel(5, 1, desertColor);
+            bmp.SetPixel(5, 0, desertColor);
+            bmp.SetPixel(6, 0, desertColor);
+            bmp.SetPixel(7, 0, desertColor);
+
+            bmp.SetPixel(4, 0, desertColor);
+            bmp.SetPixel(3, 0, desertColor);
+            bmp.SetPixel(2, 0, desertColor);
+            bmp.SetPixel(1, 0, desertColor);
+
+            Bitmap bmp_Desert = MCPMT.IsolateBiome(bmp, desertColor);
+
+            int[] startPixel = MCPMT.GetFirstNoAlphaPixelCoordinate(bmp_Desert);
+            //      _      _   
+            //     /_\  __| |_ 
+            //    / _ \/ _|  _|
+            //   /_/ \_\__|\__|
+            //
+            listePixels = MCPMT.GetBiomeBorderList(bmp_Desert, listePixels, startPixel, ref firstColumnDone, ref stopAllLoops, mvtLoop, listeStop, mvtBas, mvtHaut);
+            //      _                   _   
+            //     /_\   ______ ___ _ _| |_ 
+            //    / _ \ (_-<_-</ -_) '_|  _|
+            //   /_/ \_\/__/__/\___|_|  \__|
+            //
+            List<int[]> testListe = new List<int[]> { new int[2] { 0, 0 }, new int[2] { 0, 1 }, new int[2] { 0, 2 }, new int[2] { 0, 3 }, new int[2] { 0, 4 }, 
+                                    new int[2] { 1, 4 }, new int[2] { 2, 4 }, new int[2] { 2, 5 }, new int[2] { 2, 6 }, new int[2] { 1, 6 }, new int[2] { 0, 6 },
+                                    new int[2] { 3, 4 }, new int[2] { 4, 4 }, new int[2] { 4, 5 }, new int[2] { 4, 6 }, new int[2] { 5, 6 }, new int[2] { 6, 6 },
+                                    new int[2] { 7, 6 }, new int[2] { 7, 5 }, new int[2] { 7, 4 }, new int[2] { 7, 3 }, new int[2] { 7, 2 }, new int[2] { 8, 2 },
+                                    new int[2] { 9, 2 }, new int[2] { 9, 1 }, new int[2] { 9, 3 }, 
+                                    new int[2] { 6, 4 }, new int[2] { 5, 4 }, new int[2] { 5, 3 }, new int[2] { 5, 2 }, new int[2] { 5, 1 }, new int[2] { 5, 0 },
+                                    new int[2] { 6, 0 }, new int[2] { 7, 0 },
+                                    new int[2] { 4, 0 }, new int[2] { 3, 0 }, new int[2] { 2, 0 }, new int[2] { 1, 0 }};
+
+            foreach (var pixel in listePixels)
+            {
+                Assert.IsTrue(testListe[0].SequenceEqual(pixel));
+                testListe.RemoveAt(0);
+            }
+            Assert.IsTrue(testListe.Count() == 0);
+        }
+        [TestMethod]
+        public void CreerCartePersonnalisee_LoopCompleteComplexe_ObtientBienLabonneListeDePixelOBtientLaListeDesPixelsSkip()
+        {
+            //      _                              
+            //     /_\  _ _ _ _ __ _ _ _  __ _ ___ 
+            //    / _ \| '_| '_/ _` | ' \/ _` / -_)
+            //   /_/ \_\_| |_| \__,_|_||_\__, \___|
+            //                           |___/ 
+            DicoBiomes dicoBiomes = new DicoBiomes();
+            Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
+
+            // bitmap
+            Bitmap bmp = CreateRandomMap(width: 10, height: 7);
+            bmp.SetPixel(0, 0, desertColor);
+            bmp.SetPixel(0, 1, desertColor);
+            bmp.SetPixel(0, 2, desertColor);
+            bmp.SetPixel(0, 3, desertColor);
+            bmp.SetPixel(0, 4, desertColor);
+            bmp.SetPixel(1, 4, desertColor);
+            bmp.SetPixel(2, 4, desertColor);
+            bmp.SetPixel(2, 5, desertColor);
+            bmp.SetPixel(2, 6, desertColor);
+            bmp.SetPixel(1, 6, desertColor);
+            bmp.SetPixel(0, 6, desertColor);
+
+            bmp.SetPixel(3, 4, desertColor);
+            bmp.SetPixel(4, 4, desertColor);
+            bmp.SetPixel(4, 5, desertColor);
+            bmp.SetPixel(4, 6, desertColor);
+            bmp.SetPixel(5, 6, desertColor);
+            bmp.SetPixel(6, 6, desertColor);
+            bmp.SetPixel(7, 6, desertColor);
+            bmp.SetPixel(7, 5, desertColor);
+            bmp.SetPixel(7, 4, desertColor);
+            bmp.SetPixel(7, 3, desertColor);
+            bmp.SetPixel(7, 2, desertColor);
+            bmp.SetPixel(8, 2, desertColor);
+            bmp.SetPixel(9, 2, desertColor);
+            bmp.SetPixel(9, 1, desertColor);
+            bmp.SetPixel(9, 3, desertColor);
+
+            bmp.SetPixel(6, 4, desertColor);
+            bmp.SetPixel(5, 4, desertColor);
+            bmp.SetPixel(5, 3, desertColor);
+            bmp.SetPixel(5, 2, desertColor);
+            bmp.SetPixel(5, 1, desertColor);
+            bmp.SetPixel(5, 0, desertColor);
+            bmp.SetPixel(6, 0, desertColor);
+            bmp.SetPixel(7, 0, desertColor);
+
+            bmp.SetPixel(4, 0, desertColor);
+            bmp.SetPixel(3, 0, desertColor);
+            bmp.SetPixel(2, 0, desertColor);
+            bmp.SetPixel(1, 0, desertColor);
+
+            bmp.SetPixel(4, 1, desertColor);
+            bmp.SetPixel(4, 2, desertColor);
+            bmp.SetPixel(4, 3, desertColor);
+            bmp.SetPixel(2, 2, desertColor);
+            bmp.SetPixel(2, 3, desertColor);
+            bmp.SetPixel(3, 3, desertColor);
+            bmp.SetPixel(3, 2, desertColor);
+
+            bmp.SetPixel(5, 5, desertColor);
+            bmp.SetPixel(6, 5, desertColor);
+
+            bmp.Save(savePath + "RandomPixel_testFinal.png");
+
+            Bitmap bmp_Desert = MCPMT.IsolateBiome(bmp, desertColor);
+
+            bmp_Desert.Save(savePath + "testFinal.png");
+
+            int[] startPixel = MCPMT.GetFirstNoAlphaPixelCoordinate(bmp_Desert);
+            //      _      _   
+            //     /_\  __| |_ 
+            //    / _ \/ _|  _|
+            //   /_/ \_\__|\__|
+            //
+            listePixels = MCPMT.GetBiomeBorderList(bmp_Desert, listePixels, startPixel, ref firstColumnDone, ref stopAllLoops, mvtLoop, listeStop, mvtBas, mvtHaut);
+            Bitmap testMap = new Bitmap(width: 10, height: 7);
+            testMap = MCPMT.AddPixelsToMap(testMap, listePixels, desertColor);
+            testMap.Save(savePath + "rendus.png");
+            //      _                   _   
+            //     /_\   ______ ___ _ _| |_ 
+            //    / _ \ (_-<_-</ -_) '_|  _|
+            //   /_/ \_\/__/__/\___|_|  \__|
+            //
+            List<int[]> testListe = new List<int[]> { new int[2] { 0, 0 }, new int[2] { 0, 1 }, new int[2] { 0, 2 }, new int[2] { 0, 3 }, new int[2] { 0, 4 },
+                                    new int[2] { 1, 4 }, new int[2] { 2, 4 }, new int[2] { 2, 5 }, new int[2] { 2, 6 }, new int[2] { 1, 6 }, new int[2] { 0, 6 },
+                                    new int[2] { 3, 4 }, new int[2] { 4, 4 }, new int[2] { 4, 5 }, new int[2] { 4, 6 }, new int[2] { 5, 6 }, new int[2] { 6, 6 },
+                                    new int[2] { 7, 6 }, new int[2] { 7, 5 }, new int[2] { 7, 4 }, new int[2] { 7, 3 }, new int[2] { 7, 2 }, new int[2] { 8, 2 },
+                                    new int[2] { 9, 2 }, new int[2] { 9, 1 }, new int[2] { 9, 3 },
+                                    new int[2] { 6, 4 }, new int[2] { 5, 4 }, new int[2] { 5, 3 }, new int[2] { 5, 2 }, new int[2] { 5, 1 }, new int[2] { 5, 0 },
+                                    new int[2] { 6, 0 }, new int[2] { 7, 0 },
+                                    new int[2] { 4, 0 }, new int[2] { 3, 0 }, new int[2] { 2, 0 }, new int[2] { 1, 0 },
+                                    new int[2] { 4, 1 }, new int[2] { 4, 2 }, new int[2] { 4, 3 }, new int[2] { 2, 2 }, new int[2] { 2, 3 }, new int[2] { 3, 3 },
+                                    new int[2] { 3, 2 }, 
+                                    new int[2] { 5, 5 }, new int[2] { 6, 5 }};
+
+            foreach (var pixel in listePixels)
+            {
+                Assert.IsTrue(testListe[0].SequenceEqual(pixel));
+                testListe.RemoveAt(0);
+            }
+            Assert.IsTrue(testListe.Count() == 9);
+
+            List<int[]> testListe2 = new List<int[]>(testListe);
+            foreach (var pixel in testListe2)
+            {
+                Assert.IsTrue(testListe[0].SequenceEqual(pixel));
+                testListe.RemoveAt(0);
+            }
+            Assert.IsTrue(testListe.Count() == 0);
+        }
         public void Model()
         {
             //      _                              
