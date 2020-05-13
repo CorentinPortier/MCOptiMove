@@ -93,6 +93,50 @@ namespace Projet_MCOptiMove_Tests
             }
         }
         [TestMethod]
+        public void CreerCartePersonnalisee_UnSeulPixel_ObtientBienLabonneListeDePixel()
+        {
+            //      _                              
+            //     /_\  _ _ _ _ __ _ _ _  __ _ ___ 
+            //    / _ \| '_| '_/ _` | ' \/ _` / -_)
+            //   /_/ \_\_| |_| \__,_|_||_\__, \___|
+            //                           |___/ 
+            DicoBiomes dicoBiomes = new DicoBiomes();
+            Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
+
+            // bitmap
+            Bitmap bmp = CreateRandomMap(width: 3, height: 3);
+            bmp.SetPixel(2, 1, desertColor);
+
+            bmp.Save(savePath + "RandomPixel_unSeulPixel.png");
+
+            Bitmap bmp_Desert = MCPMT.IsolateBiome(bmp, desertColor);
+
+            bmp_Desert.Save(savePath + "unSeulPixel.png");
+
+            int[] startPixel = MCPMT.GetFirstNoAlphaPixelCoordinate(bmp_Desert);
+            //      _      _   
+            //     /_\  __| |_ 
+            //    / _ \/ _|  _|
+            //   /_/ \_\__|\__|
+            //
+            listePixels = MCPMT.GetBiomeBorderList(bmp_Desert, listePixels, startPixel, ref firstColumnDone, ref stopAllLoops, mvtLoop, listeStop, mvtBas, mvtHaut);
+            //      _                   _   
+            //     /_\   ______ ___ _ _| |_ 
+            //    / _ \ (_-<_-</ -_) '_|  _|
+            //   /_/ \_\/__/__/\___|_|  \__|
+            //
+            List<int[]> testListe = new List<int[]> { new int[2] { 2, 1 } };
+
+            foreach (var pixel in listePixels)
+            {
+                Assert.IsTrue(testListe[0].SequenceEqual(pixel));
+                testListe.RemoveAt(0);
+            }
+
+            Assert.IsTrue(testListe.Count() == 0);
+
+        }
+        [TestMethod]
         public void CreerCartePersonnalisee_MouvementsBasDroite_ObtientBienLabonneListeDePixel()
         {
             //      _                              
@@ -577,6 +621,7 @@ namespace Projet_MCOptiMove_Tests
             //   /_/ \_\__|\__|
             //
             listePixels = MCPMT.GetBiomeBorderList(bmp_Desert, listePixels, startPixel, ref firstColumnDone, ref stopAllLoops, mvtLoop, listeStop, mvtBas, mvtHaut);
+            
             Bitmap testMap = new Bitmap(width: 10, height: 7);
             testMap = MCPMT.AddPixelsToMap(testMap, listePixels, desertColor);
             testMap.Save(savePath + "rendus.png");

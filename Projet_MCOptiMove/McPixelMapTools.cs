@@ -40,9 +40,16 @@ namespace Projet_MCOptiMove
             }
             return mapBase;
         }
+        public static Bitmap DelPixelsOfMap(Bitmap mapBase, List<int[]> listePixels)
+        {
+            foreach (var pixel in listePixels)
+            {
+                mapBase.SetPixel(pixel[0], pixel[1], Color.FromArgb(alpha: 0, Color.White));
+            }
+            return mapBase;
+        }
         public static Bitmap IsolateBiome(Bitmap bmpIn, Color researchedColor)
         {
-            List<string> mvt = new List<string> { "B", "G", "D", "H" };
             Bitmap filtratedBitmap = new Bitmap(bmpIn);
 
             for (int i = 0; i < bmpIn.Width; ++i)
@@ -55,6 +62,27 @@ namespace Projet_MCOptiMove
                     }
                     else
                     {
+                        filtratedBitmap.SetPixel(i, y, Color.FromArgb(alpha: 0, Color.White));
+                    }
+                }
+            }
+            return filtratedBitmap;
+        }
+        public static Bitmap IsolateBiomes(Bitmap bmpIn, List<Color> researchedColors)
+        {
+            Bitmap filtratedBitmap = new Bitmap(bmpIn);
+
+            for (int i = 0; i < bmpIn.Width; ++i)
+            {
+                for (int y = 0; y < bmpIn.Height; ++y)
+                {
+                    if (researchedColors.Contains(bmpIn.GetPixel(i, y)))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        //On supprime les couleurs non voulues
                         filtratedBitmap.SetPixel(i, y, Color.FromArgb(alpha: 0, Color.White));
                     }
                 }
@@ -226,6 +254,79 @@ namespace Projet_MCOptiMove
                 }
             }
             return listePixels;
+        }
+        public static List<int[]> GetBottom(List<int[]> listePixels)
+        {
+            List<int> listeDesX = new List<int>();
+            foreach(int[] coords in listePixels)
+            {
+                if(!listeDesX.Contains(coords[0]))
+                {
+                    listeDesX.Add(coords[0]);
+                }
+            }
+            List<int[]> returnedList = Bottom(listeDesX, listePixels);
+            return returnedList;
+        }
+
+        // Méthodes dépendantes des précédentes méthodes.
+        static public Dictionary<Color, List<List<int[]>>> AddBiomesCluster(Bitmap myMap, Dictionary<Color, List<List<int[]>>> myDic, Color biomeColor)
+        {
+            bool stopThis = false;
+            List<List<int[]>> ClustersList = new List<List<int[]>>();
+            Bitmap bmp_biome = IsolateBiome(myMap, biomeColor);
+
+            while (!stopThis)
+            {
+                try
+                {
+                    int[] startPixel = GetFirstNoAlphaPixelCoordinate(bmp_biome);
+
+                    char[] mvtBas = new char[4] { 'B', 'G', 'D', 'H' };
+                    char[] mvtHaut = new char[4] { 'H', 'D', 'G', 'B' };
+                    List<int[]> listeDesPixels = new List<int[]>();
+                    bool firstColumnDone = false;
+                    bool stopAllLoops = false;
+                    char mvtLoop = 'B';
+                    List<char> listeStop = new List<char>() { 'H' };
+
+                    listeDesPixels = GetBiomeBorderList(bmp_biome, listeDesPixels, startPixel, ref firstColumnDone, ref stopAllLoops, mvtLoop, listeStop, mvtBas, mvtHaut);
+
+                    ClustersList.Add(listeDesPixels);
+
+                    DelPixelsOfMap(bmp_biome, listeDesPixels);
+                }
+                catch (NullReferenceException)
+                {
+                    stopThis = true;
+                }
+            }
+            myDic.Add(biomeColor, ClustersList);
+            return myDic;
+        }
+
+        // Méthodes outil
+        private static List<int[]> Bottom(List<int> listeDesX, List<int[]> listePixels)
+        {
+            List<int[]> returnedList = new List<int[]>();
+            foreach (int x in listeDesX)
+            {
+                int xSaved = x;
+                int ySaved = 0;
+
+                foreach (int[] coords in listePixels)
+                {
+                    if (coords[0] == xSaved)
+                    {
+                        if (coords[1] > ySaved)
+                        {
+                            ySaved = coords[1];
+                        }
+                    }
+                }
+                returnedList.Add(new int[2] { xSaved, ySaved });
+            }
+            return returnedList;
         }
     }
 }
