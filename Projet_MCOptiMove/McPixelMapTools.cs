@@ -122,12 +122,6 @@ namespace Projet_MCOptiMove
             // Exception levée à la première boucle car la liste est vide
             catch (Exception) { }
 
-            // Si on est sur un pixel déjà existant, on retourne en arrière
-            if (!AlreadyExist(listePixels, pixel))
-            {
-                listePixels.Add(pixel);
-            }
-
             //
             Console.WriteLine("mvtLoop =" + mvtLoop);
             //
@@ -146,6 +140,19 @@ namespace Projet_MCOptiMove
                 foreach (char mvt in listeStop)
                     Console.WriteLine("Mouvement supprimés : " + mvt);
                 //
+
+                if (listeStop.Contains('H'))
+                {
+                    if (!AlreadyExist(listePixels, pixel))
+                    {
+                        listePixels.Add(pixel);
+                    }
+
+                }
+                else
+                {
+                    listePixels.Add(pixel);
+                }
 
                 foreach (char direction in mvtsPixel)
                 {
@@ -204,6 +211,20 @@ namespace Projet_MCOptiMove
                     Console.WriteLine("Mouvement supprimés : " + mvt);
                 //
 
+                // Si on est sur un pixel déjà existant, on retourne en arrière
+                if(listeStop.Contains('D'))
+                {
+                    if (!AlreadyExist(listePixels, pixel))
+                    {
+                        listePixels.Add(pixel);
+                    }
+
+                }
+                else
+                {
+                    listePixels.Add(pixel);
+                }
+
                 foreach (char direction in mvtsPixel)
                 {
                     //
@@ -260,6 +281,18 @@ namespace Projet_MCOptiMove
             }
             return listePixels;
         }
+        public static List<int[]> GetLeft(List<int[]> listePixels, int mapWidth)
+        {
+            List<int> YsList = new List<int>();
+            foreach (int[] coords in listePixels)
+            {
+                if (!YsList.Contains(coords[1]))
+                {
+                    YsList.Add(coords[1]);
+                }
+            }
+            return Gauche(YsList, listePixels, mapWidth);
+        }
         public static List<int[]> GetBottom(List<int[]> listePixels)
         {
             List<int> XsList = new List<int>();
@@ -272,7 +305,7 @@ namespace Projet_MCOptiMove
             }
             return Bas(XsList, listePixels);
         }
-        public static List<int[]> GetLeft(List<int[]> listePixels, int mapWidth)
+        public static List<int[]> GetRight(List<int[]> listePixels)
         {
             List<int> YsList = new List<int>();
             foreach (int[] coords in listePixels)
@@ -282,7 +315,7 @@ namespace Projet_MCOptiMove
                     YsList.Add(coords[1]);
                 }
             }
-            return Gauche(YsList, listePixels, mapWidth);
+            return Droite(YsList, listePixels);
         }
 
         // Méthodes dépendantes des précédentes méthodes.
@@ -331,6 +364,28 @@ namespace Projet_MCOptiMove
             }
             return false;
         }
+        private static List<int[]> Gauche(List<int> listeDesY, List<int[]> listePixels, int mapWidth)
+        {
+            List<int[]> returnedList = new List<int[]>();
+            foreach (int y in listeDesY)
+            {
+                int ySaved = y;
+                int xSaved = mapWidth;
+
+                foreach (int[] coords in listePixels)
+                {
+                    if (coords[1] == ySaved)
+                    {
+                        if (coords[0] < xSaved)
+                        {
+                            xSaved = coords[0];
+                        }
+                    }
+                }
+                returnedList.Add(new int[2] { xSaved, ySaved });
+            }
+            return returnedList;
+        }
         private static List<int[]> Bas(List<int> listeDesX, List<int[]> listePixels)
         {
             List<int[]> returnedList = new List<int[]>();
@@ -353,19 +408,19 @@ namespace Projet_MCOptiMove
             }
             return returnedList;
         }
-        private static List<int[]> Gauche(List<int> listeDesY, List<int[]> listePixels, int mapWidth)
+        private static List<int[]> Droite(List<int> listeDesY, List<int[]> listePixels)
         {
             List<int[]> returnedList = new List<int[]>();
             foreach (int y in listeDesY)
             {
                 int ySaved = y;
-                int xSaved = mapWidth;
+                int xSaved = 0;
 
                 foreach (int[] coords in listePixels)
                 {
                     if (coords[1] == ySaved)
                     {
-                        if (coords[0] < xSaved)
+                        if (coords[0] > xSaved)
                         {
                             xSaved = coords[0];
                         }

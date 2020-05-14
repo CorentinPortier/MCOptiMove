@@ -1,10 +1,12 @@
 ﻿using NPDicoBiomes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net.NetworkInformation;
 using MCPMT = Projet_MCOptiMove.McPixelMapTools;
+
 
 
 /*string[] arrayBiomes = { "Ocean", "Frozen Ocean", "Deep Frozen Ocean", "Cold Ocean", "Deep Cold Ocean", "Deep Ocean", "Lukewarm Ocean",
@@ -25,6 +27,9 @@ namespace Projet_MCOptiMove
     {
         static void Main(string[] args)
         {
+
+            var watch = new Stopwatch();
+
             DicoBiomes dicoBiomes = new DicoBiomes();
             Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
 
@@ -58,6 +63,8 @@ namespace Projet_MCOptiMove
             bmp.SetPixel(3, 1, desertColor);
             bmp.SetPixel(2, 1, desertColor);
 
+            bmp.SetPixel(3, 0, desertColor);
+
             //bmp.SetPixel(1, 6, desertColor);
             //bmp.SetPixel(1, 7, desertColor);
             //bmp.SetPixel(2, 7, desertColor);
@@ -84,8 +91,6 @@ namespace Projet_MCOptiMove
                 Console.WriteLine("[{0}, {1}]",pix[0], pix[1]);
             }
 
-            List<int[]> testListe = new List<int[]> { new int[2] { 0, 0 }, new int[2] { 0, 1 } };
-            Console.WriteLine(testListe[0].SequenceEqual(new int[2] { 0, 0 }));
 
             // TESTS MAPS
             //char[] mvtBas = new char[4] { 'B', 'G', 'D', 'H' };
