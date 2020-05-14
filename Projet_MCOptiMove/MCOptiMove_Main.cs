@@ -27,87 +27,65 @@ namespace Projet_MCOptiMove
         {
             DicoBiomes dicoBiomes = new DicoBiomes();
             Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
-            Color gravelColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Gravelly Mountains"));
-            Color icebergColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Deep Frozen Ocean"));
 
-            Color myPoints = Color.FromArgb(255, 0, 0);
+            //bitmap
+            Bitmap bmp = MCPMT.CreateRandomMap(width: 7, height: 8);
+            bmp.SetPixel(1, 2, desertColor);
+            bmp.SetPixel(1, 3, desertColor);
+            bmp.SetPixel(1, 4, desertColor);
+            bmp.SetPixel(1, 5, desertColor);
+            bmp.SetPixel(2, 2, desertColor);
+            bmp.SetPixel(3, 2, desertColor);
+            bmp.SetPixel(4, 2, desertColor);
+            bmp.SetPixel(4, 3, desertColor);
+            bmp.SetPixel(4, 4, desertColor);
+            bmp.SetPixel(3, 4, desertColor);
+            bmp.SetPixel(3, 5, desertColor);
+            bmp.SetPixel(3, 6, desertColor);
+            bmp.SetPixel(3, 7, desertColor);
+            bmp.SetPixel(4, 7, desertColor);
+            bmp.SetPixel(5, 7, desertColor);
+            bmp.SetPixel(6, 7, desertColor);
+            bmp.SetPixel(6, 6, desertColor);
+            bmp.SetPixel(6, 5, desertColor);
+            bmp.SetPixel(5, 5, desertColor);
+            bmp.SetPixel(5, 4, desertColor);
+            bmp.SetPixel(5, 3, desertColor);
+            bmp.SetPixel(6, 3, desertColor);
+            bmp.SetPixel(5, 2, desertColor);
+            bmp.SetPixel(4, 1, desertColor);
+            bmp.SetPixel(4, 0, desertColor);
+            bmp.SetPixel(3, 1, desertColor);
+            bmp.SetPixel(2, 1, desertColor);
 
-            List<Color> colorList = new List<Color> { desertColor, gravelColor, icebergColor, myPoints };
+            //bmp.SetPixel(1, 6, desertColor);
+            //bmp.SetPixel(1, 7, desertColor);
+            //bmp.SetPixel(2, 7, desertColor);
 
-            Bitmap bmp = MCPMT.CreateRandomMap(width: 13, height: 12);
-            bmp.SetPixel(0, 0, desertColor);
-            bmp.SetPixel(1, 0, desertColor);
-            bmp.SetPixel(0, 1, desertColor);
-            bmp.SetPixel(1, 1, desertColor);
-
-            bmp.SetPixel(1, 4, gravelColor);
-            for(int y = 5; y<8;++y)
-            {
-                for(int x = 0; x<2;++x)
-                {
-                    bmp.SetPixel(x, y, gravelColor);
-                }
-            }
-
-            bmp.SetPixel(0, 9, icebergColor);
-            bmp.SetPixel(1, 9, icebergColor);
-            bmp.SetPixel(1, 10, icebergColor);
-            bmp.SetPixel(1, 11, icebergColor);
-
-            bmp.SetPixel(11, 6, desertColor);
-            bmp.SetPixel(12, 6, desertColor);
-            bmp.SetPixel(11, 7, desertColor);
-            bmp.SetPixel(12, 7, desertColor);
-
-            bmp.SetPixel(8, 2, icebergColor);
-            bmp.SetPixel(9, 2, icebergColor);
-            bmp.SetPixel(8, 3, icebergColor);
-            bmp.SetPixel(9, 3, icebergColor);
-            bmp.SetPixel(9, 4, icebergColor);
-
-            bmp.SetPixel(6, 10, myPoints);
 
             string savePath = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\RESULT_MAPS\";
-            bmp.Save(savePath + "RandomPixel_bigmap.png");
-            Bitmap bmp_allBiomes = MCPMT.IsolateBiomes(bmp, colorList);
-            bmp_allBiomes.Save(savePath + "bigmap.png");
+            bmp.Save(savePath + "RandomPixel_nope.png");
             Bitmap bmp_desert = MCPMT.IsolateBiome(bmp, desertColor);
-            bmp_desert.Save(savePath + "bigmap_desert.png");
+            bmp_desert.Save(savePath + "nope.png");
 
 
-            Dictionary<Color, List<List<int[]>>> dicoCluster = new Dictionary<Color, List<List<int[]>>>();
+            char[] mvtBas = new char[4] { 'G', 'B', 'D', 'H' };
+            char[] mvtHaut = new char[4] { 'D', 'H', 'G', 'B' };
+            List<int[]>  listePixels = new List<int[]>();
+            bool firstColumnDone = false;
+            bool stopAllLoops = false;
+            char mvtLoop = 'B';
+            List<char> listeStop = new List<char>() { 'H' };
 
-            MCPMT.AddBiomesCluster(bmp, dicoCluster, desertColor);
-            MCPMT.AddBiomesCluster(bmp, dicoCluster, icebergColor);
+            int[] startPixel = MCPMT.GetFirstNoAlphaPixelCoordinate(bmp_desert);
 
-            foreach (KeyValuePair<Color, List<List<int[]>>> item in dicoCluster)
+            foreach(var pix in MCPMT.GetBiomeBorderList(bmp_desert, listePixels, startPixel, ref firstColumnDone, ref stopAllLoops, mvtLoop, listeStop, mvtBas, mvtHaut))
             {
-                Console.WriteLine("Couleur : " + item.Key + ": ");
-                foreach (var cluster in item.Value)
-                {
-                    Console.WriteLine("cluster :");
-                    foreach( var coords in cluster)
-                    {
-                        Console.Write("[{0},{1}]", coords[0], coords[1]);
-                    }
-                    Console.WriteLine();
-                }
+                Console.WriteLine("[{0}, {1}]",pix[0], pix[1]);
             }
-            Console.WriteLine("\n");
 
-            //List<int[]> clusternew = dicoCluster[icebergColor][1];
-            //List<int[]> temp = MCPMT.GetBottom(clusternew);
-
-            foreach (KeyValuePair<Color, List<List<int[]>>> item in dicoCluster)
-            {
-                foreach( var cluster in item.Value)
-                {
-                    List<int[]> temp = MCPMT.GetBottom(cluster);
-                    foreach(var coords in temp)
-                        Console.Write("[{0},{1}]", coords[0], coords[1]);
-                    Console.WriteLine();
-                }
-            }               
+            List<int[]> testListe = new List<int[]> { new int[2] { 0, 0 }, new int[2] { 0, 1 } };
+            Console.WriteLine(testListe[0].SequenceEqual(new int[2] { 0, 0 }));
 
             // TESTS MAPS
             //char[] mvtBas = new char[4] { 'B', 'G', 'D', 'H' };
@@ -130,8 +108,7 @@ namespace Projet_MCOptiMove
             //    Console.WriteLine();
             //}
         }
-
-        
+ 
         static public Bitmap getMyMap(Bitmap bmpBase, List<List<int[]>> listeDesClusters)
         {
             Bitmap myMap = new Bitmap(bmpBase);

@@ -122,7 +122,11 @@ namespace Projet_MCOptiMove
             // Exception levée à la première boucle car la liste est vide
             catch (Exception) { }
 
-            listePixels.Add(pixel);
+            // Si on est sur un pixel déjà existant, on retourne en arrière
+            if (!AlreadyExist(listePixels, pixel))
+            {
+                listePixels.Add(pixel);
+            }
 
             //
             Console.WriteLine("mvtLoop =" + mvtLoop);
@@ -150,16 +154,16 @@ namespace Projet_MCOptiMove
                     //
                     switch (direction)
                     {
-                        case ('B'):
-                            if ((pixel[1] + 1 < bmp.Height) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0], pixel[1] + 1)))
-                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] + 1 }, ref firstColumnDone, ref stopAllLoops, mvtLoop, new List<char> { 'H' }, mvtBas, mvtHaut);
+                        case ('G'):
+                            if ((pixel[0] - 1 >= 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0] - 1, pixel[1])))
+                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0] - 1, pixel[1] }, ref firstColumnDone, ref stopAllLoops, mvtLoop, new List<char> { 'D' }, mvtBas, mvtHaut);
                             if (stopAllLoops)
                                 return listePixels;
                             break;
 
-                        case ('G'):
-                            if ((pixel[0] - 1 >= 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0] - 1, pixel[1])))
-                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0] - 1, pixel[1] }, ref firstColumnDone, ref stopAllLoops, mvtLoop, new List<char> { 'D' }, mvtBas, mvtHaut);
+                        case ('B'):
+                            if ((pixel[1] + 1 < bmp.Height) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0], pixel[1] + 1)))
+                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] + 1 }, ref firstColumnDone, ref stopAllLoops, mvtLoop, new List<char> { 'H' }, mvtBas, mvtHaut);
                             if (stopAllLoops)
                                 return listePixels;
                             break;
@@ -207,17 +211,6 @@ namespace Projet_MCOptiMove
                     //
                     switch (direction)
                     {
-                        case ('H'):
-                            if ((pixel[1] - 1 >= 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0], pixel[1] - 1)))
-                            {
-                                // On garde le sens de la boucle;
-                                // mvtLoop = 'H';
-                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] - 1 }, ref firstColumnDone, ref stopAllLoops, mvtLoop: 'H', new List<char> { 'B' }, mvtBas, mvtHaut);
-                            }
-                            if (stopAllLoops)
-                                return listePixels;
-                            break;
-
                         case ('D'):
                             if ((pixel[0] + 1 < bmp.Width) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0] + 1, pixel[1])))
                             {
@@ -229,9 +222,21 @@ namespace Projet_MCOptiMove
                                 return listePixels;
                             break;
 
+                        case ('H'):
+                            if ((pixel[1] - 1 >= 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0], pixel[1] - 1)))
+                            {
+                                // On garde le sens de la boucle;
+                                // mvtLoop = 'H';
+                                listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0], pixel[1] - 1 }, ref firstColumnDone, ref stopAllLoops, mvtLoop: 'H', new List<char> { 'B' }, mvtBas, mvtHaut);
+                            }
+                            if (stopAllLoops)
+                                return listePixels;
+                            break;
+
                         case ('G'):
                             if ((pixel[0] - 1 >= 0) && (bmp.GetPixel(pixel[0], pixel[1]) == bmp.GetPixel(pixel[0] - 1, pixel[1])))
                             {
+
                                 // On garde le sens de la boucle;
                                 // mvtLoop = 'H';
                                 listePixels = GetBiomeBorderList(bmp, listePixels, new int[2] { pixel[0] - 1, pixel[1] }, ref firstColumnDone, ref stopAllLoops, mvtLoop: 'H', new List<char> { 'D' }, mvtBas, mvtHaut);
@@ -257,16 +262,27 @@ namespace Projet_MCOptiMove
         }
         public static List<int[]> GetBottom(List<int[]> listePixels)
         {
-            List<int> listeDesX = new List<int>();
+            List<int> XsList = new List<int>();
             foreach(int[] coords in listePixels)
             {
-                if(!listeDesX.Contains(coords[0]))
+                if(!XsList.Contains(coords[0]))
                 {
-                    listeDesX.Add(coords[0]);
+                    XsList.Add(coords[0]);
                 }
             }
-            List<int[]> returnedList = Bottom(listeDesX, listePixels);
-            return returnedList;
+            return Bas(XsList, listePixels);
+        }
+        public static List<int[]> GetLeft(List<int[]> listePixels, int mapWidth)
+        {
+            List<int> YsList = new List<int>();
+            foreach (int[] coords in listePixels)
+            {
+                if (!YsList.Contains(coords[1]))
+                {
+                    YsList.Add(coords[1]);
+                }
+            }
+            return Gauche(YsList, listePixels, mapWidth);
         }
 
         // Méthodes dépendantes des précédentes méthodes.
@@ -306,7 +322,16 @@ namespace Projet_MCOptiMove
         }
 
         // Méthodes outil
-        private static List<int[]> Bottom(List<int> listeDesX, List<int[]> listePixels)
+        private static bool AlreadyExist(List<int[]> listePixels, int[] pixel)
+        {
+            foreach(var pix in listePixels)
+            {
+                if (pix.SequenceEqual(pixel))
+                    return true;
+            }
+            return false;
+        }
+        private static List<int[]> Bas(List<int> listeDesX, List<int[]> listePixels)
         {
             List<int[]> returnedList = new List<int[]>();
             foreach (int x in listeDesX)
@@ -321,6 +346,28 @@ namespace Projet_MCOptiMove
                         if (coords[1] > ySaved)
                         {
                             ySaved = coords[1];
+                        }
+                    }
+                }
+                returnedList.Add(new int[2] { xSaved, ySaved });
+            }
+            return returnedList;
+        }
+        private static List<int[]> Gauche(List<int> listeDesY, List<int[]> listePixels, int mapWidth)
+        {
+            List<int[]> returnedList = new List<int[]>();
+            foreach (int y in listeDesY)
+            {
+                int ySaved = y;
+                int xSaved = mapWidth;
+
+                foreach (int[] coords in listePixels)
+                {
+                    if (coords[1] == ySaved)
+                    {
+                        if (coords[0] < xSaved)
+                        {
+                            xSaved = coords[0];
                         }
                     }
                 }
