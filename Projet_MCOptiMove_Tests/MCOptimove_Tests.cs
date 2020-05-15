@@ -658,7 +658,7 @@ namespace Projet_MCOptiMove_Tests
             Assert.IsTrue(testListe.Count() == 0);
         }
         [TestMethod]
-        public void ChargerUneCarte_RechercherLesArretesDuBas_ObtientBienLabonneListeDePixel()
+        public void CreerCartePersonnalisee_RechercherLesArretesDuBas_ObtientBienLabonneListeDePixel()
         {
             //      _                              
             //     /_\  _ _ _ _ __ _ _ _  __ _ ___ 
@@ -748,7 +748,7 @@ namespace Projet_MCOptiMove_Tests
             Assert.AreEqual(testListe.Count, 0);
         }
         [TestMethod]
-        public void ChargerUneCarte_RechercherLesArretesDeGauche_ObtientBienLabonneListeDePixel()
+        public void CreerCartePersonnalisee_RechercherLesArretesDeGauche_ObtientBienLabonneListeDePixel()
         {
             //      _                              
             //     /_\  _ _ _ _ __ _ _ _  __ _ ___ 
@@ -836,6 +836,402 @@ namespace Projet_MCOptiMove_Tests
                 }
             }
             Assert.AreEqual(testListe.Count, 0);
+        }
+        [TestMethod]
+        public void CreerCartePersonnalisee_RechercherLesArretesDeDroite_ObtientBienLabonneListeDePixel()
+        {
+            //      _                              
+            //     /_\  _ _ _ _ __ _ _ _  __ _ ___ 
+            //    / _ \| '_| '_/ _` | ' \/ _` / -_)
+            //   /_/ \_\_| |_| \__,_|_||_\__, \___|
+            //                           |___/ 
+            DicoBiomes dicoBiomes = new DicoBiomes();
+            Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
+            Color gravelColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Gravelly Mountains"));
+            Color icebergColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Deep Frozen Ocean"));
+
+            Color myPoints = Color.FromArgb(255, 0, 0);
+
+            List<Color> colorList = new List<Color> { desertColor, gravelColor, icebergColor, myPoints };
+
+            //bitmap
+            Bitmap bmp = MCPMT.CreateRandomMap(width: 13, height: 12);
+            bmp.SetPixel(0, 0, desertColor);
+            bmp.SetPixel(1, 0, desertColor);
+            bmp.SetPixel(0, 1, desertColor);
+            bmp.SetPixel(1, 1, desertColor);
+
+            bmp.SetPixel(1, 4, gravelColor);
+            for (int y = 5; y < 8; ++y)
+            {
+                for (int x = 0; x < 2; ++x)
+                {
+                    bmp.SetPixel(x, y, gravelColor);
+                }
+            }
+
+            bmp.SetPixel(0, 9, icebergColor);
+            bmp.SetPixel(1, 9, icebergColor);
+            bmp.SetPixel(1, 10, icebergColor);
+            bmp.SetPixel(1, 11, icebergColor);
+
+            bmp.SetPixel(11, 6, desertColor);
+            bmp.SetPixel(12, 6, desertColor);
+            bmp.SetPixel(11, 7, desertColor);
+            bmp.SetPixel(12, 7, desertColor);
+
+            bmp.SetPixel(8, 2, icebergColor);
+            bmp.SetPixel(9, 2, icebergColor);
+            bmp.SetPixel(8, 3, icebergColor);
+            bmp.SetPixel(9, 3, icebergColor);
+            bmp.SetPixel(9, 4, icebergColor);
+
+            bmp.SetPixel(6, 10, myPoints);
+
+            string savePath = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\RESULT_MAPS\";
+            bmp.Save(savePath + "RandomPixel_bigmap.png");
+            Bitmap bmp_allBiomes = MCPMT.IsolateBiomes(bmp, colorList);
+            bmp_allBiomes.Save(savePath + "bigmap.png");
+            Bitmap bmp_desert = MCPMT.IsolateBiome(bmp, desertColor);
+            bmp_desert.Save(savePath + "bigmap_desert.png");
+
+
+            Dictionary<Color, List<List<int[]>>> dicoCluster = new Dictionary<Color, List<List<int[]>>>();
+            //      _      _   
+            //     /_\  __| |_ 
+            //    / _ \/ _|  _|
+            //   /_/ \_\__|\__|
+            //
+
+            MCPMT.AddBiomesCluster(bmp, dicoCluster, desertColor);
+            MCPMT.AddBiomesCluster(bmp, dicoCluster, icebergColor);
+
+            //      _                   _   
+            //     /_\   ______ ___ _ _| |_ 
+            //    / _ \ (_-<_-</ -_) '_|  _|
+            //   /_/ \_\/__/__/\___|_|  \__|
+            //
+            List<int[]> testListe = new List<int[]> { new int[2] { 1, 0 }, new int[2] { 1, 1 }, new int[2] { 12, 6 }, new int[2] { 12, 7 },
+                                    new int[2] { 1, 9 }, new int[2] { 1, 10 }, new int[2] { 1, 11 }, new int[2] { 9, 2 },new int[2] { 9, 3 }, new int[2] { 9, 4 } };
+
+            foreach (KeyValuePair<Color, List<List<int[]>>> item in dicoCluster)
+            {
+                foreach (var cluster in item.Value)
+                {
+                    foreach (var coords in MCPMT.GetRight(cluster))
+                    {
+                        Assert.IsTrue((testListe[0][0] == coords[0]) && (testListe[0][1] == coords[1]));
+                        testListe.RemoveAt(0);
+                    }
+                }
+            }
+            Assert.AreEqual(testListe.Count, 0);
+        }
+        [TestMethod]
+        public void CreerCartePersonnalisee_RechercherLesArretesDuHaut_ObtientBienLabonneListeDePixel()
+        {
+            //      _                              
+            //     /_\  _ _ _ _ __ _ _ _  __ _ ___ 
+            //    / _ \| '_| '_/ _` | ' \/ _` / -_)
+            //   /_/ \_\_| |_| \__,_|_||_\__, \___|
+            //                           |___/ 
+            DicoBiomes dicoBiomes = new DicoBiomes();
+            Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
+            Color gravelColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Gravelly Mountains"));
+            Color icebergColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Deep Frozen Ocean"));
+
+            Color myPoints = Color.FromArgb(255, 0, 0);
+
+            List<Color> colorList = new List<Color> { desertColor, gravelColor, icebergColor, myPoints };
+
+            //bitmap
+            Bitmap bmp = MCPMT.CreateRandomMap(width: 13, height: 12);
+            bmp.SetPixel(0, 0, desertColor);
+            bmp.SetPixel(1, 0, desertColor);
+            bmp.SetPixel(0, 1, desertColor);
+            bmp.SetPixel(1, 1, desertColor);
+
+            bmp.SetPixel(1, 4, gravelColor);
+            for (int y = 5; y < 8; ++y)
+            {
+                for (int x = 0; x < 2; ++x)
+                {
+                    bmp.SetPixel(x, y, gravelColor);
+                }
+            }
+
+            bmp.SetPixel(0, 9, icebergColor);
+            bmp.SetPixel(1, 9, icebergColor);
+            bmp.SetPixel(1, 10, icebergColor);
+            bmp.SetPixel(1, 11, icebergColor);
+
+            bmp.SetPixel(11, 6, desertColor);
+            bmp.SetPixel(12, 6, desertColor);
+            bmp.SetPixel(11, 7, desertColor);
+            bmp.SetPixel(12, 7, desertColor);
+
+            bmp.SetPixel(8, 2, icebergColor);
+            bmp.SetPixel(9, 2, icebergColor);
+            bmp.SetPixel(8, 3, icebergColor);
+            bmp.SetPixel(9, 3, icebergColor);
+            bmp.SetPixel(9, 4, icebergColor);
+
+            bmp.SetPixel(6, 10, myPoints);
+
+            string savePath = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\RESULT_MAPS\";
+            bmp.Save(savePath + "RandomPixel_bigmap.png");
+            Bitmap bmp_allBiomes = MCPMT.IsolateBiomes(bmp, colorList);
+            bmp_allBiomes.Save(savePath + "bigmap.png");
+            Bitmap bmp_desert = MCPMT.IsolateBiome(bmp, desertColor);
+            bmp_desert.Save(savePath + "bigmap_desert.png");
+
+
+            Dictionary<Color, List<List<int[]>>> dicoCluster = new Dictionary<Color, List<List<int[]>>>();
+            //      _      _   
+            //     /_\  __| |_ 
+            //    / _ \/ _|  _|
+            //   /_/ \_\__|\__|
+            //
+
+            MCPMT.AddBiomesCluster(bmp, dicoCluster, desertColor);
+            MCPMT.AddBiomesCluster(bmp, dicoCluster, icebergColor);
+
+            //      _                   _   
+            //     /_\   ______ ___ _ _| |_ 
+            //    / _ \ (_-<_-</ -_) '_|  _|
+            //   /_/ \_\/__/__/\___|_|  \__|
+            //
+            List<int[]> testListe = new List<int[]> { new int[2] { 0, 0 }, new int[2] { 1, 0 }, new int[2] { 11, 6 }, new int[2] { 12, 6 },
+                                    new int[2] { 0, 9 }, new int[2] { 1, 9 }, new int[2] { 8, 2 },new int[2] { 9, 2 } };
+
+            foreach (KeyValuePair<Color, List<List<int[]>>> item in dicoCluster)
+            {
+                foreach (var cluster in item.Value)
+                {
+                    foreach (var coords in MCPMT.GetTop(cluster, bmp.Height))
+                    {
+                        Assert.IsTrue((testListe[0][0] == coords[0]) && (testListe[0][1] == coords[1]));
+                        testListe.RemoveAt(0);
+                    }
+                }
+            }
+            Assert.AreEqual(testListe.Count, 0);
+        }
+        [TestMethod]
+        public void CreerCartePersonnalisee_TestBoucleSurSoitMemeHB_ObtientBienLabonneListeDePixel()
+        {
+            //      _                              
+            //     /_\  _ _ _ _ __ _ _ _  __ _ ___ 
+            //    / _ \| '_| '_/ _` | ' \/ _` / -_)
+            //   /_/ \_\_| |_| \__,_|_||_\__, \___|
+            //                           |___/ 
+            DicoBiomes dicoBiomes = new DicoBiomes();
+            Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
+
+            //bitmap
+            Bitmap bmp = MCPMT.CreateRandomMap(width: 4, height: 5);
+            bmp.SetPixel(0, 0, desertColor);
+            bmp.SetPixel(1, 0, desertColor);
+            bmp.SetPixel(2, 0, desertColor);
+            bmp.SetPixel(3, 0, desertColor);
+            bmp.SetPixel(3, 1, desertColor);
+            bmp.SetPixel(3, 2, desertColor);
+            bmp.SetPixel(3, 3, desertColor);
+            bmp.SetPixel(3, 4, desertColor);
+            bmp.SetPixel(2, 4, desertColor);
+            bmp.SetPixel(1, 4, desertColor);
+            bmp.SetPixel(1, 3, desertColor);
+            bmp.SetPixel(1, 2, desertColor);
+            bmp.SetPixel(2, 2, desertColor);
+
+            string savePath = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\RESULT_MAPS\";
+            bmp.Save(savePath + "RandomPixel_HB.png");
+
+            int[] startPixel = MCPMT.GetFirstNoAlphaPixelCoordinate(MCPMT.IsolateBiome(bmp, desertColor));
+            //      _      _   
+            //     /_\  __| |_ 
+            //    / _ \/ _|  _|
+            //   /_/ \_\__|\__|
+            //
+
+            listePixels = MCPMT.GetBiomeBorderList(MCPMT.IsolateBiome(bmp, desertColor), listePixels, startPixel, ref firstColumnDone, ref stopAllLoops, mvtLoop, listeStop, mvtBas, mvtHaut);
+
+            //      _                   _   
+            //     /_\   ______ ___ _ _| |_ 
+            //    / _ \ (_-<_-</ -_) '_|  _|
+            //   /_/ \_\/__/__/\___|_|  \__|
+            //
+            List<int[]> testListe = new List<int[]> { new int[2] { 0, 0 }, new int[2] { 1, 0 }, new int[2] { 2, 0 }, new int[2] { 3, 0 },
+                                    new int[2] { 3, 1 }, new int[2] { 3, 2 }, new int[2] { 2, 2 }, new int[2] { 1, 2 }, new int[2] { 1, 3 },
+                                    new int[2] { 1, 4 }, new int[2] { 2, 4 }, new int[2] { 3, 4 }, new int[2] { 3, 3 }};
+            foreach (var pixel in listePixels)
+            {
+                Assert.IsTrue(testListe[0].SequenceEqual(pixel));
+                testListe.RemoveAt(0);
+            }
+            Assert.IsTrue(testListe.Count() == 0);
+
+        }
+        [TestMethod]
+        public void CreerCartePersonnalisee_TestBoucleSurSoitMemeHD_ObtientBienLabonneListeDePixel()
+        {
+            //      _                              
+            //     /_\  _ _ _ _ __ _ _ _  __ _ ___ 
+            //    / _ \| '_| '_/ _` | ' \/ _` / -_)
+            //   /_/ \_\_| |_| \__,_|_||_\__, \___|
+            //                           |___/ 
+            DicoBiomes dicoBiomes = new DicoBiomes();
+            Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
+
+            //bitmap
+            Bitmap bmp = MCPMT.CreateRandomMap(width: 4, height: 3);
+            bmp.SetPixel(0, 0, desertColor);
+            bmp.SetPixel(1, 0, desertColor);
+            bmp.SetPixel(2, 0, desertColor);
+            bmp.SetPixel(3, 0, desertColor);
+            bmp.SetPixel(3, 1, desertColor);
+            bmp.SetPixel(3, 2, desertColor);
+            bmp.SetPixel(2, 2, desertColor);
+            bmp.SetPixel(1, 2, desertColor);
+            bmp.SetPixel(1, 1, desertColor);
+
+            string savePath = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\RESULT_MAPS\";
+            bmp.Save(savePath + "RandomPixel_HD.png");
+
+            int[] startPixel = MCPMT.GetFirstNoAlphaPixelCoordinate(MCPMT.IsolateBiome(bmp, desertColor));
+            //      _      _   
+            //     /_\  __| |_ 
+            //    / _ \/ _|  _|
+            //   /_/ \_\__|\__|
+            //
+
+            listePixels = MCPMT.GetBiomeBorderList(MCPMT.IsolateBiome(bmp, desertColor), listePixels, startPixel, ref firstColumnDone, ref stopAllLoops, mvtLoop, listeStop, mvtBas, mvtHaut);
+
+            //      _                   _   
+            //     /_\   ______ ___ _ _| |_ 
+            //    / _ \ (_-<_-</ -_) '_|  _|
+            //   /_/ \_\/__/__/\___|_|  \__|
+            //
+            List<int[]> testListe = new List<int[]> { new int[2] { 0, 0 }, new int[2] { 1, 0 }, new int[2] { 1, 1 }, new int[2] { 1, 2 }, new int[2] { 2, 2 },
+                                    new int[2] { 3, 2 }, new int[2] { 3, 1 }, new int[2] { 3, 0 }, new int[2] { 2, 0 }};
+           
+            foreach (var pixel in listePixels)
+            {
+                Assert.IsTrue(testListe[0].SequenceEqual(pixel));
+                testListe.RemoveAt(0);
+            }
+            Assert.IsTrue(testListe.Count() == 0);
+
+        }
+        [TestMethod]
+        public void CreerCartePersonnalisee_TestBoucleSurSoitMemeBH_ObtientBienLabonneListeDePixel()
+        {
+            //      _                              
+            //     /_\  _ _ _ _ __ _ _ _  __ _ ___ 
+            //    / _ \| '_| '_/ _` | ' \/ _` / -_)
+            //   /_/ \_\_| |_| \__,_|_||_\__, \___|
+            //                           |___/ 
+            DicoBiomes dicoBiomes = new DicoBiomes();
+            Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
+
+            //bitmap
+            Bitmap bmp = MCPMT.CreateRandomMap(width: 4, height: 3);
+            bmp.SetPixel(0, 2, desertColor);
+            bmp.SetPixel(1, 0, desertColor);
+            bmp.SetPixel(2, 0, desertColor);
+            bmp.SetPixel(3, 0, desertColor);
+            bmp.SetPixel(3, 1, desertColor);
+            bmp.SetPixel(3, 2, desertColor);
+            bmp.SetPixel(2, 2, desertColor);
+            bmp.SetPixel(1, 2, desertColor);
+            bmp.SetPixel(1, 1, desertColor);
+
+            string savePath = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\RESULT_MAPS\";
+            bmp.Save(savePath + "RandomPixel_BH.png");
+
+            int[] startPixel = MCPMT.GetFirstNoAlphaPixelCoordinate(MCPMT.IsolateBiome(bmp, desertColor));
+            //      _      _   
+            //     /_\  __| |_ 
+            //    / _ \/ _|  _|
+            //   /_/ \_\__|\__|
+            //
+
+            listePixels = MCPMT.GetBiomeBorderList(MCPMT.IsolateBiome(bmp, desertColor), listePixels, startPixel, ref firstColumnDone, ref stopAllLoops, mvtLoop, listeStop, mvtBas, mvtHaut);
+
+            //      _                   _   
+            //     /_\   ______ ___ _ _| |_ 
+            //    / _ \ (_-<_-</ -_) '_|  _|
+            //   /_/ \_\/__/__/\___|_|  \__|
+            //
+            List<int[]> testListe = new List<int[]> { new int[2] { 0, 2 }, new int[2] { 1, 2 }, new int[2] { 2, 2 }, new int[2] { 3, 2 }, new int[2] { 3, 1 },
+                                    new int[2] { 3, 0 }, new int[2] { 2, 0 }, new int[2] { 1, 0 }, new int[2] { 1, 1 }};
+
+            foreach (var pixel in listePixels)
+            {
+                Assert.IsTrue(testListe[0].SequenceEqual(pixel));
+                testListe.RemoveAt(0);
+            }
+            Assert.IsTrue(testListe.Count() == 0);
+
+        }
+        [TestMethod]
+        public void CreerCartePersonnalisee_TestBoucleSurSoitMemeBG_ObtientBienLabonneListeDePixel()
+        {
+            //      _                              
+            //     /_\  _ _ _ _ __ _ _ _  __ _ ___ 
+            //    / _ \| '_| '_/ _` | ' \/ _` / -_)
+            //   /_/ \_\_| |_| \__,_|_||_\__, \___|
+            //                           |___/ 
+            DicoBiomes dicoBiomes = new DicoBiomes();
+            Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
+
+            //bitmap
+            Bitmap bmp = MCPMT.CreateRandomMap(width: 4, height: 5);
+            bmp.SetPixel(1, 0, desertColor);
+            bmp.SetPixel(2, 0, desertColor);
+            bmp.SetPixel(3, 0, desertColor);
+            bmp.SetPixel(3, 1, desertColor);
+            bmp.SetPixel(3, 2, desertColor);
+            bmp.SetPixel(3, 3, desertColor);
+            bmp.SetPixel(3, 4, desertColor);
+            bmp.SetPixel(2, 4, desertColor);
+            bmp.SetPixel(1, 4, desertColor);
+            bmp.SetPixel(0, 4, desertColor);
+            bmp.SetPixel(1, 1, desertColor);
+            bmp.SetPixel(1, 2, desertColor);
+            bmp.SetPixel(2, 2, desertColor);
+
+            foreach(var col in bmp.Palette.Entries)
+                Console.WriteLine(col);
+
+            string savePath = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\RESULT_MAPS\";
+            bmp.Save(savePath + "RandomPixel_BG.png");
+
+            int[] startPixel = MCPMT.GetFirstNoAlphaPixelCoordinate(MCPMT.IsolateBiome(bmp, desertColor));
+            //      _      _   
+            //     /_\  __| |_ 
+            //    / _ \/ _|  _|
+            //   /_/ \_\__|\__|
+            //
+
+            listePixels = MCPMT.GetBiomeBorderList(MCPMT.IsolateBiome(bmp, desertColor), listePixels, startPixel, ref firstColumnDone, ref stopAllLoops, mvtLoop, listeStop, mvtBas, mvtHaut);
+
+            //      _                   _   
+            //     /_\   ______ ___ _ _| |_ 
+            //    / _ \ (_-<_-</ -_) '_|  _|
+            //   /_/ \_\/__/__/\___|_|  \__|
+            //
+            List<int[]> testListe = new List<int[]> { new int[2] { 0, 4 }, new int[2] { 1, 4 }, new int[2] { 2, 4 }, new int[2] { 3, 4 },
+                                    new int[2] { 3, 3 }, new int[2] { 3, 2 }, new int[2] { 3, 1 }, new int[2] { 3, 0 }, new int[2] { 2, 0 },
+                                    new int[2] { 1, 0 }, new int[2] { 1, 1 }, new int[2] { 1, 2 }, new int[2] { 2, 2 }};
+
+            foreach (var pixel in listePixels)
+            {
+                Assert.IsTrue(testListe[0].SequenceEqual(pixel));
+                testListe.RemoveAt(0);
+            }
+            Assert.IsTrue(testListe.Count() == 0);
+
         }
         public void Model()
         {

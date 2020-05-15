@@ -141,13 +141,16 @@ namespace Projet_MCOptiMove
                     Console.WriteLine("Mouvement supprimés : " + mvt);
                 //
 
-                if (listeStop.Contains('H'))
+                if (listeStop.Contains('G') || listeStop.Contains('H') || listeStop.Contains('D'))
                 {
                     if (!AlreadyExist(listePixels, pixel))
                     {
                         listePixels.Add(pixel);
                     }
-
+                    //
+                    else
+                        Console.WriteLine("J'existe déjà !");
+                    //
                 }
                 else
                 {
@@ -212,12 +215,16 @@ namespace Projet_MCOptiMove
                 //
 
                 // Si on est sur un pixel déjà existant, on retourne en arrière
-                if(listeStop.Contains('D'))
+                if(listeStop.Contains('D') || listeStop.Contains('B'))
                 {
                     if (!AlreadyExist(listePixels, pixel))
                     {
                         listePixels.Add(pixel);
                     }
+                    //
+                    else
+                        Console.WriteLine("J'existe déjà !");
+                    //
 
                 }
                 else
@@ -317,8 +324,21 @@ namespace Projet_MCOptiMove
             }
             return Droite(YsList, listePixels);
         }
+        public static List<int[]> GetTop(List<int[]> listePixels, int mapHeight)
+        {
+            List<int> XsList = new List<int>();
+            foreach (int[] coords in listePixels)
+            {
+                if (!XsList.Contains(coords[0]))
+                {
+                    XsList.Add(coords[0]);
+                }
+            }
+            return Haut(XsList, listePixels, mapHeight);
+        }
 
         // Méthodes dépendantes des précédentes méthodes.
+        // Il faudrait également enlever ce qu'il se trouve au milieu d'un cluster...
         static public Dictionary<Color, List<List<int[]>>> AddBiomesCluster(Bitmap myMap, Dictionary<Color, List<List<int[]>>> myDic, Color biomeColor)
         {
             bool stopThis = false;
@@ -331,8 +351,8 @@ namespace Projet_MCOptiMove
                 {
                     int[] startPixel = GetFirstNoAlphaPixelCoordinate(bmp_biome);
 
-                    char[] mvtBas = new char[4] { 'B', 'G', 'D', 'H' };
-                    char[] mvtHaut = new char[4] { 'H', 'D', 'G', 'B' };
+                    char[] mvtBas = new char[4] { 'G', 'B', 'D', 'H' };
+                    char[] mvtHaut = new char[4] { 'D', 'H', 'G', 'B' };
                     List<int[]> listeDesPixels = new List<int[]>();
                     bool firstColumnDone = false;
                     bool stopAllLoops = false;
@@ -423,6 +443,28 @@ namespace Projet_MCOptiMove
                         if (coords[0] > xSaved)
                         {
                             xSaved = coords[0];
+                        }
+                    }
+                }
+                returnedList.Add(new int[2] { xSaved, ySaved });
+            }
+            return returnedList;
+        }
+        private static List<int[]> Haut(List<int> listeDesX, List<int[]> listePixels, int mapHeight)
+        {
+            List<int[]> returnedList = new List<int[]>();
+            foreach (int x in listeDesX)
+            {
+                int xSaved = x;
+                int ySaved = mapHeight;
+                
+                foreach (int[] coords in listePixels)
+                {
+                    if (coords[0] == xSaved)
+                    {
+                        if (coords[1] < ySaved)
+                        {
+                            ySaved = coords[1];
                         }
                     }
                 }

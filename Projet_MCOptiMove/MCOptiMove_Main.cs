@@ -28,73 +28,9 @@ namespace Projet_MCOptiMove
         static void Main(string[] args)
         {
 
-            var watch = new Stopwatch();
-
-            DicoBiomes dicoBiomes = new DicoBiomes();
-            Color desertColor = MCPMT.GetColor(dicoBiomes.GetColorOfBiome("Desert"));
-
-            //bitmap
-            Bitmap bmp = MCPMT.CreateRandomMap(width: 7, height: 8);
-            bmp.SetPixel(1, 2, desertColor);
-            bmp.SetPixel(1, 3, desertColor);
-            bmp.SetPixel(1, 4, desertColor);
-            bmp.SetPixel(1, 5, desertColor);
-            bmp.SetPixel(2, 2, desertColor);
-            bmp.SetPixel(3, 2, desertColor);
-            bmp.SetPixel(4, 2, desertColor);
-            bmp.SetPixel(4, 3, desertColor);
-            bmp.SetPixel(4, 4, desertColor);
-            bmp.SetPixel(3, 4, desertColor);
-            bmp.SetPixel(3, 5, desertColor);
-            bmp.SetPixel(3, 6, desertColor);
-            bmp.SetPixel(3, 7, desertColor);
-            bmp.SetPixel(4, 7, desertColor);
-            bmp.SetPixel(5, 7, desertColor);
-            bmp.SetPixel(6, 7, desertColor);
-            bmp.SetPixel(6, 6, desertColor);
-            bmp.SetPixel(6, 5, desertColor);
-            bmp.SetPixel(5, 5, desertColor);
-            bmp.SetPixel(5, 4, desertColor);
-            bmp.SetPixel(5, 3, desertColor);
-            bmp.SetPixel(6, 3, desertColor);
-            bmp.SetPixel(5, 2, desertColor);
-            bmp.SetPixel(4, 1, desertColor);
-            bmp.SetPixel(4, 0, desertColor);
-            bmp.SetPixel(3, 1, desertColor);
-            bmp.SetPixel(2, 1, desertColor);
-
-            bmp.SetPixel(3, 0, desertColor);
-
-            //bmp.SetPixel(1, 6, desertColor);
-            //bmp.SetPixel(1, 7, desertColor);
-            //bmp.SetPixel(2, 7, desertColor);
-
-
-            string savePath = @"C:\Users\portable\Documents\Travail\Moi\Programmation\C#\Projet_MCOptiMove\RESULT_MAPS\";
-            bmp.Save(savePath + "RandomPixel_nope.png");
-            Bitmap bmp_desert = MCPMT.IsolateBiome(bmp, desertColor);
-            bmp_desert.Save(savePath + "nope.png");
-
-
-            char[] mvtBas = new char[4] { 'G', 'B', 'D', 'H' };
-            char[] mvtHaut = new char[4] { 'D', 'H', 'G', 'B' };
-            List<int[]>  listePixels = new List<int[]>();
-            bool firstColumnDone = false;
-            bool stopAllLoops = false;
-            char mvtLoop = 'B';
-            List<char> listeStop = new List<char>() { 'H' };
-
-            int[] startPixel = MCPMT.GetFirstNoAlphaPixelCoordinate(bmp_desert);
-
-            foreach(var pix in MCPMT.GetBiomeBorderList(bmp_desert, listePixels, startPixel, ref firstColumnDone, ref stopAllLoops, mvtLoop, listeStop, mvtBas, mvtHaut))
-            {
-                Console.WriteLine("[{0}, {1}]",pix[0], pix[1]);
-            }
-
-
             // TESTS MAPS
-            //char[] mvtBas = new char[4] { 'B', 'G', 'D', 'H' };
-            //char[] mvtHaut = new char[4] { 'H', 'D', 'G', 'B' };
+            //char[] mvtBas = new char[4] { 'G', 'B', 'D', 'H' };
+            //char[] mvtHaut = new char[4] { 'D', 'H', 'G', 'B' };
             //List<int[]> listePixels = new List<int[]>();
             //bool firstColumnDone = false;
             //char mvtLoop = 'B';
